@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Analysis</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+
+<body class="p-6">
+    <form id="domainForm" action="/" method="post" class="max-w-sm mx-auto">
+        <div class="mb-4">
+            <label for="image_url" class="block text-gray-700 text-sm font-bold mb-2">Image URL:</label>
+            <input type="text" name="image_url" id="image_url"
+                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+        </div>
+        <button type="submit"
+            class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Analyze</button>
+    </form>
+
+    <div id="imagesResult"></div>
+
+    <script>
+        document.getElementById('domainForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+            const imageURL = document.getElementById('image_url').value;
+            console.log(imageURL);
+            fetchAndDisplayResults(imageURL);
+        });
+
+        function createImageElement(imageData) {
+            // You can customize this function to create HTML elements based on your JSON data
+            const element = document.createElement('div');
+            element.className = 'bg-gray-900 shadow overflow-hidden sm:rounded-lg p-4 card-transition';
+            element.innerHTML = `
+      <div class="px-4 py-5 sm:px-6 flex justify-between items-center">
+        <img src="${imageData.image_url}" />
+        <span class="text-sm text-gray-400">${imageData.language}</span>
+      </div>
+    `;
+            return element;
+        }
+
+        function displayResults(imageData) {
+            const resultsContainer = document.getElementById('imagesResult');
+            resultsContainer.innerHTML = '';
+            imageData.forEach(data => {
+                resultsContainer.appendChild(createImageElement(data));
+            });
+        }
+
+        function fetchAndDisplayResults(imageURL) {
+            fetch('/fetch-data', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+                body: `image_url=${encodeURIComponent(imageURL)}`
+            })
+                .then(response => response.json())
+                .then(data => {
+                    displayResults(data);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        }
+    </script>
+</body>
+
+</html>
