@@ -97,10 +97,6 @@ def get_base64_image_uri(image_url, file_content):
     return f"data:{img_type};base64,{img_encoded}"
 
 def search_image(image_url, langs):
-    print(f"Starting analysis for '{image_url}'...")
-    sleep(1.5)
-    print(f"Languages for analysis: {', '.join(langs)}")
-
     processed_urls = set()
     all_images = []
 

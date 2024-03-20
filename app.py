@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template, jsonify
+from flask import Flask, request, render_template, jsonify, abort
 import main  # Import your existing main.py script
 
 app = Flask(__name__)
@@ -13,6 +13,8 @@ def index():
 def fetch_data():
     image_url = request.form['image_url']
     images = main.search_image(image_url, langs)  # Modify languages as needed
+    if len(images) == 0:
+        return jsonify({"message": "no images found"}), 404
     return jsonify(images)
 
 if __name__ == '__main__':
