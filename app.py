@@ -12,9 +12,9 @@ def index():
 @app.route('/fetch-data', methods=['POST'])
 def fetch_data():
     image_url = request.form['image_url']
-    images = main.search_image(image_url, langs)  # Modify languages as needed
-    if len(images) == 0:
-        return jsonify({"message": "no images found"}), 404
+    images, errors = main.search_image(image_url, langs)  # Modify languages as needed
+    if len(errors) != 0:
+        return jsonify({"errors": [str(error) for error in errors]}), 400
     return jsonify(images)
 
 if __name__ == '__main__':

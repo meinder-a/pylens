@@ -67,48 +67,69 @@ document.addEventListener('DOMContentLoaded', () => {
         element.appendChild(image);
 
         // Details
-        const details = createDetailsElement(data);
-        element.appendChild(details);
+        console.log(data);
+        const detailsHtml = createDetailsElement(data);
+        element.innerHTML += detailsHtml
 
         return element;
     }
 
     function createDetailsElement(data) {
-        const detailsContainer = document.createElement('div');
-        detailsContainer.className = 'image-details';
-
-        const languageInfo = document.createElement('span');
-        languageInfo.textContent = `Language: ${data.language}`;
-        detailsContainer.appendChild(languageInfo);
-
+        let imageLinkHtml = '';
         if (data.image_url) {
-            const viewImageLink = createLinkElement(data.image_url, 'View Image');
-            detailsContainer.appendChild(viewImageLink);
+            imageLinkHtml = `
+            <div class="px-4 py-2 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+                <dt class="text-sm font-medium leading-6 text-gray-300">Image Link</dt>
+                <dd class="mt-1 text-sm leading-6 text-gray-100 sm:col-span-2 sm:mt-0">
+                    <a href="${data.image_url}" target="_blank" rel="noopener noreferrer">View Image</a>
+                </dd>
+            </div>`;
         }
 
+        let referenceLinkHtml = '';
         if (data.reference_url) {
-            const viewPageLink = createLinkElement(data.reference_url, 'View Page');
-            detailsContainer.appendChild(viewPageLink);
-
             let domain = (new URL(data.reference_url)).hostname;
-            if (! domain.startsWith("http")) {
+            if (!domain.startsWith("http")) {
                 domain = "http://" + domain;
             }
-            
-            const domainLabel = createLinkElement(domain, domain)
-            detailsContainer.appendChild(domainLabel);
+            referenceLinkHtml = `
+            <div class="px-4 py-2 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+                <dt class="text-sm font-medium leading-6 text-gray-300">Domain</dt>
+                <dd class="mt-1 text-sm leading-6 text-gray-100 sm:col-span-2 sm:mt-0">
+                    <a href="${data.reference_url}" target="_blank" rel="noopener noreferrer">${domain}</a>
+                </dd>
+            </div>`;
         }
 
-        return detailsContainer;
-    }
+        let searchEngineHtml = '';
+        if (data.reference_url) {
+            let domain = (new URL(data.reference_url)).hostname;
+            if (!domain.startsWith("http")) {
+                domain = "http://" + domain;
+            }
+            searchEngineHtml = `
+            <div class="px-4 py-2 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+                <dt class="text-sm font-medium leading-6 text-gray-300">Search Engine</dt>
+                <dd class="mt-1 text-sm leading-6 text-gray-100 sm:col-span-2 sm:mt-0">
+                    <span>${data.search_engine}</span>
+                </dd>
+            </div>`;
+        }
 
-    function createLinkElement(href, text) {
-        const link = document.createElement('a');
-        link.href = href;
-        link.target = '_blank';
-        link.rel = 'noopener noreferrer';
-        link.textContent = text;
-        return link;
+        return `
+        <div class="mt-6 border-t border-gray-700 text-white">
+            <dl class="divide-y divide-gray-700">
+                <div class="px-4 py-2 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+                    <dt class="text-sm font-medium leading-6 text-gray-300">Country</dt>
+                    <dd class="mt-1 text-sm leading-6 text-gray-100 sm:col-span-2 sm:mt-0">
+                        <span class="fi fi-${data.language}"></span>
+                    </dd>
+                </div>
+                ${imageLinkHtml}
+                ${referenceLinkHtml}
+                ${searchEngineHtml}
+            </dl>
+        </div>`;
     }
 
     function handleError(error) {
@@ -119,10 +140,6 @@ document.addEventListener('DOMContentLoaded', () => {
     function showSuccessAlert(foo) {
         console.log(foo);
         showAlert('Success', 'See images below', 'green');
-    }
-
-    function resetAlert() {
-        toggleVisibility(document.getElementById('alert'));
     }
 
     function showAlert(title, body, color = 'blue') {
